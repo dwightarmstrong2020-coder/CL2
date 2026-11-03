@@ -145,7 +145,7 @@ pub mod builtins {
             if(isVerb) {
                 match ch {
                     'A' => {
-                        result.push_str()
+                        result.push_str(vals.p);
                     }
                 }
             }
