@@ -1,2 +1,3 @@
-# CL2
-Made with WriteCode (writecode.in)
+#Common Lisp,
+##Made in Rust
+I suck at this
