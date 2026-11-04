@@ -1,5 +1,5 @@
 [package]
-name    = "Common Lisp"
+name    = "Common-Lisp"
 version = "1.0.0"
 edition = "2024"
 

@@ -7,7 +7,7 @@ pub struct Atom<T: Clone> {
 pub type CLVoid = Atom<()>;
 
 #[allow(dead_code)]
-pub impl<T: Clone> Atom<T> {
+impl<T: Clone> Atom<T> {
     fn new(v: T) -> Self {
         Atom {v: v}
     }
@@ -18,12 +18,12 @@ pub impl<T: Clone> Atom<T> {
 }
 
 #[allow(unused_macros)]
-pub macro_rules! atom {
+macro_rules! atom {
     ($v:expr) => {{Atom::new($v)}};
 }
 
 #[allow(unused_macros)]
-pub macro_rules! clist {
+macro_rules! clist {
     () => {{
         atom!(Vec<Atom<_>>::new())
     }};
@@ -37,7 +37,7 @@ pub macro_rules! clist {
 }
 
 #[allow(unused_macros)]
-pub macro_rules! chash {
+macro_rules! chash {
     () => {{
         atom!(HashMap<Atom<_>, Atom<_>>::new())
     }};
@@ -51,7 +51,7 @@ pub macro_rules! chash {
 }
 
 #[allow(unused_macros)]
-pub macro_rules! cons {
+macro_rules! cons {
     ($left:expr, $right:expr) => {{atom!([atom!($left), atom!($right)])}};
 }
 
@@ -65,7 +65,7 @@ pub struct SEpression<T: Clone, R: Clone> {
     func: CLFunc<T, R>,
 }
 
-pub impl<T: Clone, R: Clone> SEpression<T, R> {
+impl<T: Clone, R: Clone> SEpression<T, R> {
     fn new(cb: CLFunc<T, R>, args: Vec<Atom<T>>) -> Self {
         SEpression {func: cb, args: args}
     }
@@ -75,7 +75,7 @@ pub impl<T: Clone, R: Clone> SEpression<T, R> {
     }
 }
 
-pub macro_rules! sexpr {
+macro_rules! sexpr {
     ( $func:expr, w args $($arg:expr),* $(,)? ) => {{
         let mut v: Vec<Atom<_>> = Vec::new();
         $( v.push($arg); )*
@@ -114,58 +114,35 @@ pub mod builtins {
         if nums.len() < 2 { return atom!(Err("Can't be less than 2".to_string())); }
         let mut total = nums[0].v;
         for n in &nums[1..] {
-            total -= n.v;
+            total /= n.v;
         }
         atom!(Ok(total))
     }
-    pub fn WRITE(nums: &Vec<Atom<&dyn Any>>) -> Atom<std::io::Result<()>> {
-        use std::fs;
-        use std::io::Result;
-        if nums.len() == 2 {
-            let mut f: fs::File = nums[1].v;
-            let bytes: Vec<u8> = nums[0].v;
-            atom!(f.write_all(&bytes)?);
-        } else if nums.len() == 1 {
-            let v: String = nums[0];
-            print!(v);
+    pub fn WRITE(nums: &Vec<Atom<&dyn Any>>) -> Atom<Result<(), String>> {
+        if nums.len() == 1 {
+            print!("");
         }
-        atom!(Result::Ok(()))
+        atom!(Ok(()))
     }
     pub fn FORMAT(vals: &Vec<Atom<&dyn Any>>) -> Atom<Option<String>> {
-        let mut result: String = "".to_string();
-        let toParse: String = vals[1].v
-        let args = vals[2..];
+        let result: String = "".to_string();
+        let toParse: &str = "";
         let mut isVerb = false;
 
         for ch in toParse.chars() {
-            if(ch == '~') {
+            if ch == '~' {
                 isVerb = true;
                 continue;
             }
-            if(isVerb) {
+            if isVerb {
                 match ch {
-                    'A' => {
-                        result.push_str(vals.p);
-                    }
+                    'A' => {}
+                    _ => {}
                 }
             }
         }
-
-        if vals[0].v {
-            print!(result.as_str());
-            atom!(None)
-        } else {
-            atom!(Some(result))
-        }
+        atom!(None)
     }
-}
-
-fn OptionHandler<T, R>(thing: Option<T>,someCb: F, noneCb: G) -> R
-where F: FnOnce(T) -> R, G: FnOnce() -> R {
-    return match thing {
-        Some(x) => someCb(x),
-        None => noneCb()
-    };
 }
 
 fn main() {}
